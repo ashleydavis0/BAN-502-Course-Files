@@ -1,0 +1,168 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+```{r}
+library(readr)
+data <- read_csv("train.csv.zip")
+View(data)
+```
+```{r}
+#install.packages("tidyverse")
+#install.packages("VIM")
+#install.packages("mice")
+#install.packages("gridExtra")
+```
+```{r}
+library(VIM)
+library(tidyverse)
+library(mice)
+library(gridExtra)
+```
+
+
+```{r}
+vim_plot = aggr(data, numbers = TRUE, prop =c(TRUE,FALSE), cex.axis=.7)
+```
+```{r}
+str(data)
+summary(data)
+```
+
+
+
+```{r}
+train_data = data %>% drop_na()
+
+```
+
+```{r}
+set.seed(1234)
+imp_data = mice(data, m=5, method='pmm', printFlag = FALSE)
+summary(imp_data)
+```
+
+```{r}
+densityplot(imp_data, ~measurement_7)
+```
+
+```{r}
+data_complete = complete(imp_data)
+summary(data_complete)
+```
+```{r}
+str(data_complete)
+summary(data_complete)
+```
+```{r}
+p1 = ggplot(data_complete, aes(x = measurement_0, fill = failure)) + geom_bar(position = "fill")
+p2 = ggplot(data_complete, aes(x = measurement_1, fill = failure)) + geom_bar(position = "fill")
+p3 = ggplot(data_complete, aes(x = measurement_2, fill = failure)) + geom_bar(position = "fill")
+p4 = ggplot(data_complete, aes(x = measurement_3, fill = failure)) + geom_bar(position = "fill")
+p5 = ggplot(data_complete, aes(x = measurement_4, fill = failure)) + geom_bar(position = "fill")
+p6 = ggplot(data_complete, aes(x = measurement_5, fill = failure)) + geom_bar(position = "fill")
+p7 = ggplot(data_complete, aes(x = measurement_6, fill = failure)) + geom_bar(position = "fill")
+p8 = ggplot(data_complete, aes(x = measurement_7, fill = failure)) + geom_bar(position = "fill")
+p9 = ggplot(data_complete, aes(x = measurement_8, fill = failure)) + geom_bar(position = "fill")
+p10 = ggplot(data_complete, aes(x = measurement_9, fill = failure)) + geom_bar(position = "fill")
+p11 = ggplot(data_complete, aes(x = measurement_10, fill = failure)) + geom_bar(position = "fill")
+p12 = ggplot(data_complete, aes(x = measurement_11, fill = failure)) + geom_bar(position = "fill")
+p13 = ggplot(data_complete, aes(x = measurement_12, fill = failure)) + geom_bar(position = "fill")
+p14 = ggplot(data_complete, aes(x = measurement_13, fill = failure)) + geom_bar(position = "fill")
+p15 = ggplot(data_complete, aes(x = measurement_14, fill = failure)) + geom_bar(position = "fill")
+p16 = ggplot(data_complete, aes(x = measurement_15, fill = failure)) + geom_bar(position = "fill")
+p17 = ggplot(data_complete, aes(x = measurement_16, fill = failure)) + geom_bar(position = "fill")
+p18 = ggplot(data_complete, aes(x = measurement_17, fill = failure)) + geom_bar(position = "fill")
+grid.arrange(p1,p2,p3,p4)
+grid.arrange(p5,p6,p7,p8)
+grid.arrange(p9,p10,p11,p12)
+grid.arrange(p13,p14,p15,p16)
+grid.arrange(p17,p18)
+```
+
+```{r}
+ggplot(data= data_complete) +
+  geom_point(mapping= aes(x = product_code, y= loading, color=failure))
+```
+
+```{r}
+p1 = ggplot(data_complete, aes(x = loading, y = product_code)) + geom_boxplot()
+p2 = ggplot(data_complete, aes(x = loading, y = attribute_0)) + geom_boxplot()
+p3 = ggplot(data_complete, aes(x = loading, y = failure)) + geom_boxplot()
+grid.arrange(p1,p2,p3, ncol = 2)
+```
+```{r}
+ggplot(data= data_complete) +
+  geom_point(mapping= aes(x = product_code, y= loading, color=failure))
+```
+
+```{r}
+ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=product_code, fill=failure))
+```
+```{r}
+ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=attribute_0, fill=failure))
+```
+```{r}
+ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=attribute_2, fill=failure))
+```
+```{r}
+ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=attribute_3, fill=failure))
+```
+```{r}
+p1 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_1, y=failure), stat= "identity")
+p2 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_2, y=failure), stat= "identity")
+p3 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_3, y=failure), stat= "identity")
+p4 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_0, y=failure), stat= "identity")
+p5 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_4, y=failure), stat= "identity")
+p6 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_5, y=failure), stat= "identity")
+p7 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_6, y=failure), stat= "identity")
+p8 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_7, y=failure), stat= "identity")
+p9 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_8, y=failure), stat= "identity")
+p10 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_9, y=failure), stat= "identity")
+p11 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_10, y=failure), stat= "identity")
+p12 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_11, y=failure), stat= "identity")
+p13 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_12, y=failure), stat= "identity")
+p14 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_13, y=failure), stat= "identity")
+p15 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_14, y=failure), stat= "identity")
+p16 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_15, y=failure), stat= "identity")
+p17 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_16, y=failure), stat= "identity")
+p18 =ggplot(data= data_complete) +
+  geom_bar(mapping = aes( x=measurement_17, y=failure), stat= "identity")
+grid.arrange(p1,p2,p3,p4)
+grid.arrange(p5,p6,p7,p8)
+grid.arrange(p9,p10,p11,p12)
+grid.arrange(p13,p14,p15,p16)
+grid.arrange(p17,p18)
+```
+
+```{r}
+ggplot(data= data_complete) +
+  geom_point(mapping = aes(x= measurement_0, y=loading, color=failure))
+```
+```{r}
+ggplot(data= data_complete) +
+  geom_bar(mapping = aes(x=failure))
+```
+
