@@ -1,0 +1,72 @@
+```{r}
+library(tidyverse)
+library(tidymodels)
+library("GGally")
+library(ggcorrplot)
+library(lmtest)
+```
+
+```{r}
+air= airquality
+```
+
+1= 153
+2= 6
+
+
+```{r}
+summary(air)
+str(air)
+```
+
+3= True
+
+
+
+
+```{r}
+lm(formula= air$Ozone ~ air$Solar.R + air$Wind + air$Temp + air$Month + air$Day)
+```
+4= Temp ???
+
+```{r}
+air2 = air %>% drop_na()
+```
+
+5= 111
+6= 6
+
+
+```{r}
+ggpairs(air2)
+ggcore(air2)
+```
+7= C (temp)
+
+8=E (day)
+
+```{r}
+p1= ggplot(air2, aes(x= Temp, y=Ozone))+ geom_point(alpha=0.1)
+```
+
+
+```{r}
+mod1= lm(Ozone~ Temp, air2)
+summary(mod1)
+```
+10 = 2.439
+11= .488
+12= Yes
+
+```{r}
+confint(mod1$fit$fit$fit)
+```
+13= True?
+
+14= 
+```{r}
+-147.646+ (2.4391*80)
+
+```
+15= False
+

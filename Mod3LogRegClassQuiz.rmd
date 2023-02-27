@@ -1,0 +1,203 @@
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(e1071)
+library(ROCR)
+```
+
+```{r}
+library(readr)
+parole <- read_csv("parole.csv")
+View(parole)
+```
+
+```{r}
+parole = parole %>% mutate(male = as_factor(male))
+parole = parole %>% mutate(race = as_factor(race))
+parole = parole %>% mutate(state = as_factor(state))
+parole = parole %>% mutate(crime = as_factor(crime))
+parole = parole %>% mutate(multiple.offenses = as_factor(multiple.offenses))
+parole = parole %>% mutate(violator = as_factor(violator))
+```
+
+```{r}
+parole %>% count(violator)
+```
+
+```{r}
+set.seed(12345)
+parole_split = initial_split(parole, prop =0.70, strata= violator)
+train = training(parole_split)
+test= testing(parole_split)
+```
+
+
+```{r}
+levels(train$violator)
+```
+```{r}
+train = train %>% mutate(violator = fct_relevel(violator, c("No","Yes")))
+levels(train$violator)
+```
+
+
+
+```{r}
+ggplot(train, aes(x=male, fill=violator)) +geom_bar() + theme_bw()
+```
+1 is male and blue is violator. 
+
+
+
+```{r}
+ggplot(train, aes(x=state, fill=violator)) +geom_bar() + theme_bw()
+```
+Loiusian is 3 so FALSE
+
+
+```{r}
+ggplot(train, aes(x=max.sentence, fill=violator)) +geom_bar() + theme_bw()
+```
+Vilation rate and max sentence is higher   TRUE
+
+LOG REG: using state to predict violator #6
+
+```{r}
+
+parole_model =
+  logistic_reg() %>%
+  set_engine("glm")
+  
+parole_simple = recipe(violator ~ state, train)
+
+logreg_wf= workflow() %>%
+  add_recipe(parole_simple)%>%
+  add_model(parole_model)
+
+parole_fit =fit(logreg_wf, train)
+
+```
+
+```{r}
+summary(parole_fit$fit$fit$fit)
+```
+
+
+#8
+```{r}
+parole_model2 =
+  logistic_reg() %>%
+  set_engine("glm")
+  
+parole_simple2 = recipe(violator ~ state + multiple.offenses + race, train)
+
+logreg_wf2= workflow() %>%
+  add_recipe(parole_simple2)%>%
+  add_model(parole_model2)
+
+parole_fit2 =fit(logreg_wf2, train)
+```
+
+```{r}
+summary(parole_fit2$fit$fit$fit)
+```
+```{r}
+newdata= data.frame(state = "3", multiple.offenses = "1" , race = "1")
+predict(parole_fit2, newdata, type="prob")
+```
+
+
+
+
+
+
+```{r}
+predictions = predict(parole_fit2, train, type="prob")[2]
+head(predictions)
+```
+```{r}
+predictions= predict(parole_fit2, train, type="prob")[2]
+head(predicitions)
+```
+
+
+```{r}
+ROCRpred = prediction(predictions,train$violator)
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+plot(ROCRperf, colorize=TRUE, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(-0.2,1.7))
+```
+```{r}
+as.numeric(performance(ROCRpred, "auc")@y.values)
+```
+
+```{r}
+#Determine threshold to balance sensitivity and specificity
+#DO NOT modify this code
+opt.cut = function(perf, pred){
+    cut.ind = mapply(FUN=function(x, y, p){
+        d = (x - 0)^2 + (y-1)^2
+        ind = which(d == min(d))
+        c(sensitivity = y[[ind]], specificity = 1-x[[ind]], 
+            cutoff = p[[ind]])
+    }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+print(opt.cut(ROCRperf, ROCRpred))
+```
+
+```{r}
+#confusion matrix
+#The "No" and "Yes" represent the actual values
+#The "FALSE" and "TRUE" represent our predicted values
+t1 = table(train$violator,predictions > 0.2015788)
+t1
+```
+Calculate accuracy  
+```{r}
+(t1[1,1]+t1[2,2])/nrow(train)
+```
+Sens
+```{r}
+36/(18+36)
+```
+
+
+```{r}
+predictions2= predict(parole_fit2, test, type="prob")[2]
+head(predictions2)
+```
+
+```{r}
+ROCRpred = prediction(predictions2,test$violator)
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+plot(ROCRperf, colorize=TRUE, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(-0.2,1.7))
+```
+```{r}
+as.numeric(performance(ROCRpred, "auc")@y.values)
+```
+```{r}
+#Determine threshold to balance sensitivity and specificity
+#DO NOT modify this code
+opt.cut = function(perf, pred){
+    cut.ind = mapply(FUN=function(x, y, p){
+        d = (x - 0)^2 + (y-1)^2
+        ind = which(d == min(d))
+        c(sensitivity = y[[ind]], specificity = 1-x[[ind]], 
+            cutoff = p[[ind]])
+    }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+print(opt.cut(ROCRperf, ROCRpred))
+```
+
+```{r}
+#confusion matrix
+#The "No" and "Yes" represent the actual values
+#The "FALSE" and "TRUE" represent our predicted values
+t2 = table(test$violator,predictions2 > 0.5)
+t2
+```
+
+
+
+```{r}
+(t2[1,1]+t2[2,2])/nrow(test)
+```
